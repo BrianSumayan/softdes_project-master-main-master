@@ -22,7 +22,7 @@ function App() {
   const [isFileValid, setIsFileValid] = useState(false);
 
   const handleStartScan = async () => {
-    if (!isFileValid) return; // Prevent scan if no valid file is selected
+    if (!isFileValid || !selectedFile) return; // Prevent scan if no valid file is selected
 
     setIsScanning(true);
     setEngineStatus({
@@ -35,9 +35,19 @@ function App() {
     setDetectionMessage("");
     setShowModal(false); // Ensure modal doesn't show automatically
     setCurrentFault("");
+
+    const formData = new FormData();
+    formData.append("sound", selectedFile);
+
     try {
-      const response = await axios.get(
-        "https://softdes-project-master-main-5.onrender.com/api/start-scan"
+      const response = await axios.post(
+        "https://softdes-project-master-main-5.onrender.com/api/start-scan",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       if (response.data.message === "Anomaly Detected!") {
         setDetectionMessage(response.data.message);
